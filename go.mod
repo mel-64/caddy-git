@@ -1,4 +1,5 @@
-module github.com/greenpau/caddy-git
+module git.shork.ch/melody/caddy-git
+
 
 go 1.20
 

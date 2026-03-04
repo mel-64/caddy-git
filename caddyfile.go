@@ -22,7 +22,7 @@ import (
 	"github.com/caddyserver/caddy/v2/caddyconfig/caddyfile"
 	"github.com/caddyserver/caddy/v2/caddyconfig/httpcaddyfile"
 	"github.com/caddyserver/caddy/v2/modules/caddyhttp"
-	"github.com/greenpau/caddy-git/pkg/service"
+	"git.shork.ch/melody/caddy-git/pkg/service"
 	"strconv"
 	"strings"
 )

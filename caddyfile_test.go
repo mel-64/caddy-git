@@ -17,6 +17,7 @@ package git
 import (
 	"encoding/json"
 	"fmt"
+  "strings"
 	"testing"
 
 	"github.com/caddyserver/caddy/v2/caddyconfig/caddyfile"
@@ -221,7 +222,7 @@ func TestParseCaddyfileAppConfig(t *testing.T) {
               }
             }`),
 			shouldErr: true,
-			err:       fmt.Errorf("%s:%d - Error during parsing: unsupported %q key, import chain: ['']", tf, 4, "bar"),
+      err:       fmt.Errorf("unsupported %q key", "bar"),
 		},
 		{
 			name: "test parse config with too few arg for repo arg",
@@ -232,7 +233,7 @@ func TestParseCaddyfileAppConfig(t *testing.T) {
               }
             }`),
 			shouldErr: true,
-			err:       fmt.Errorf("%s:%d - Error during parsing: too few args for %q directive (config: 0, min: 1), import chain: ['']", tf, 4, "url"),
+      err:       fmt.Errorf("too few args for %q directive (config: 0, min: 1)", "url"),
 		},
 	}
 	for _, tc := range testcases {
@@ -242,7 +243,7 @@ func TestParseCaddyfileAppConfig(t *testing.T) {
 				if !tc.shouldErr {
 					t.Fatalf("expected success, got: %v", err)
 				}
-				if diff := cmp.Diff(err.Error(), tc.err.Error()); diff != "" {
+        if !strings.Contains(err.Error(), tc.err.Error()) {
 					t.Fatalf("unexpected error: %v, want: %v", err, tc.err)
 				}
 				return

@@ -16,6 +16,7 @@ package service
 
 import (
 	"bytes"
+	"errors"
 	"fmt"
 	"github.com/go-git/go-git/v5"
 	"github.com/go-git/go-git/v5/plumbing"
@@ -155,6 +156,16 @@ func (r *Repository) runUpdate() error {
 			)
 			return nil
 		}
+		if errors.Is(err, git.ErrNonFastForwardUpdate) && r.Config.ForcePull {
+			if syncErr := forceSyncToRemote(repo, w, r.Config); syncErr != nil {
+				return syncErr
+			}
+			r.logger.Debug(
+				"force-synced repo to remote after non-fast-forward update",
+				zap.String("repo_name", r.Config.Name),
+			)
+			return nil
+		}
 		return err
 	}
 	ref, err := repo.Head()
@@ -172,6 +183,28 @@ func (r *Repository) runUpdate() error {
 		zap.Any("commit", commit.Hash.String()),
 	)
 	return nil
+}
+
+func forceSyncToRemote(repo *git.Repository, w *git.Worktree, cfg *RepositoryConfig) error {
+	branch := cfg.Branch
+	if branch == "" {
+		head, err := repo.Head()
+		if err != nil {
+			return err
+		}
+		branch = head.Name().Short()
+	}
+
+	remoteRefName := plumbing.NewRemoteReferenceName("origin", branch)
+	remoteRef, err := repo.Reference(remoteRefName, true)
+	if err != nil {
+		return err
+	}
+
+	return w.Reset(&git.ResetOptions{
+		Mode:   git.HardReset,
+		Commit: remoteRef.Hash(),
+	})
 }
 
 func dirExists(s string) (bool, error) {
@@ -204,6 +237,7 @@ func configureCloneOptions(cfg *RepositoryConfig, opts *git.CloneOptions) error 
 
 func configurePullOptions(cfg *RepositoryConfig, opts *git.PullOptions) error {
 	opts.RemoteName = "origin"
+	opts.Force = cfg.ForcePull
 	trAuthMethod, err := configureAuthOptions(cfg)
 	if err != nil {
 		return err

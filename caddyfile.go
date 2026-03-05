@@ -45,6 +45,7 @@ func init() {
 //     webhook <name> <header> <secret>
 //     branch <name>
 //     depth 1
+//     force_pull
 //     update every <seconds>
 //   }
 
@@ -64,6 +65,7 @@ var argRules = map[string]argRule{
 	"auth":     argRule{Min: 2, Max: 255},
 	"branch":   argRule{Min: 1, Max: 1},
 	"depth":    argRule{Min: 1, Max: 1},
+	"force_pull": argRule{Min: 0, Max: 0},
 	"update":   argRule{Min: 1, Max: 255},
 	"webhook":  argRule{Min: 3, Max: 3},
 	"post":     argRule{Min: 2, Max: 2},
@@ -147,6 +149,8 @@ func parseCaddyfileAppConfig(d *caddyfile.Dispenser, _ interface{}) (interface{}
 						return nil, d.Errf("%s value %q is not integer", k, v[0])
 					}
 					// return nil, d.Errf("the depth directive is disabled due to the issue with github.com/go-git/go-git")
+				case "force_pull":
+					rc.ForcePull = true
 				case "post":
 					switch {
 					case strings.Join(v, " ") == "pull exec":

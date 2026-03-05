@@ -130,6 +130,31 @@ func TestParseCaddyfileAppConfig(t *testing.T) {
               }
             }`,
 		},
+      		{
+      			name: "test parse repo config with force pull",
+      			d: caddyfile.NewTestDispenser(`
+                  git {
+                    repo authp.github.io {
+                      base_dir /tmp
+                      url https://github.com/authp/authp.github.io.git
+                      branch gh-pages
+                      force_pull
+                    }
+                  }`),
+      			want: `{
+      			  "config": {
+                      "repositories": [
+                        {
+                          "address":  "https://github.com/authp/authp.github.io.git",
+                          "base_dir": "/tmp",
+                          "branch":   "gh-pages",
+                          "force_pull": true,
+                          "name":     "authp.github.io"
+                        }
+                      ]
+                    }
+      			}`,
+      		},
 		{
 			name: "test parse ssh config with key-based auth",
 			d: caddyfile.NewTestDispenser(`

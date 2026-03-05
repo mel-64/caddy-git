@@ -38,8 +38,8 @@ Configuration examples:
 * [Routeless config](./assets/config/routeless/Caddyfile)
 
 For example, the following configuration sets up a definition for `authp.github.io`
-repo. The request to `authp.myfiosgateway.com/update/authp.github.io` trigger
-`git pull` of the `authp.github.io` repository.
+repo. A request to `authp.myfiosgateway.com/update/authp.github.io` triggers
+an update (`git pull`) of the `authp.github.io` repository.
 
 ```
 {
@@ -48,6 +48,7 @@ repo. The request to `authp.myfiosgateway.com/update/authp.github.io` trigger
       base_dir /tmp
       url https://github.com/authp/authp.github.io.git
       branch gh-pages
+      force_pull
       post pull exec {
         name Pager
         command /usr/bin/echo
@@ -72,8 +73,11 @@ authp.myfiosgateway.com {
 }
 ```
 
-The cloning of the repository happens on startup. Additionally, the cloning
-happens when `/update/authp.github.io` is being hit.
+The initial clone of the repository happens on startup. Additionally, hitting
+`/update/authp.github.io` triggers an update pull.
+
+When `force_pull` is set, non-fast-forward pull failures are handled by
+force-syncing the local branch to the remote branch tip.
 
 ```
 curl https://authp.myfiosgateway.com/update/authp.github.io

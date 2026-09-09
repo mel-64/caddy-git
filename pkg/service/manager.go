@@ -43,11 +43,15 @@ func NewManager(cfg *Config, logger *zap.Logger) (*Manager, error) {
 		r, _ := NewRepository(rc)
 		r.logger = logger
 		m.repos[rc.Name] = r
-		if err := r.update(); err != nil {
-			m.logger.Error("failed managing repo", zap.String("repo_name", rc.Name), zap.Error(err))
-			return nil, err
-		}
-		m.logger.Debug("registered and synced repo", zap.String("repo_name", rc.Name))
+		m.logger.Debug("registered repo", zap.String("repo_name", rc.Name))
+		// Clone/pull a run post-exec in the background so we don't block startup
+		go func(r *Repository) {
+			if err := r.update(); err != nil {
+				m.logger.Error("failed managing repo", zap.String("repo_name", r.Config.Name), zap.Error(err))
+				return
+			}
+			m.logger.Debug("synced repo", zap.String("repo_name", r.Config.Name))
+		}(r)
 		if rc.UpdateInterval > 0 {
 			go autoUpdater(r)
 		}

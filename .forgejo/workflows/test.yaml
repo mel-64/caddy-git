@@ -12,6 +12,7 @@ jobs:
   build:
     runs-on: alpine-tools
     steps:
+      - uses: actions/checkout@v7
       - name: go test
         id: go-test
         run: |

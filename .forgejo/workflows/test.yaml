@@ -2,6 +2,7 @@ name: Go tests
 
 on:
   dispatch:
+  pull_request:
   push:
     paths:
       - '**/*.go'

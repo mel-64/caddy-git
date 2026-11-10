@@ -3,7 +3,7 @@ module git.shork.ch/melody/caddy-git
 go 1.27.3
 
 require (
-	github.com/caddyserver/caddy/v2 v2.11.8
+	github.com/caddyserver/caddy/v2 v2.11.9
 	github.com/go-git/go-git/v5 v5.19.3
 	github.com/google/go-cmp v0.7.0
 	go.uber.org/zap v1.28.0
